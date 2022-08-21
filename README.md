@@ -1,2 +1,4 @@
 # msfploit
-hek nasa
+```
+update auto inject manual  V1, V2
+```
