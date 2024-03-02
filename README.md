@@ -5,8 +5,7 @@ msploit adalah sebuah tools remake dari evil-droid yang sudah di fix dan bisa di
   
 - langkah langkah install
 ```
-
-
+git clone https://github.com/K1M4K-ID/msfploit;cd msfploit;bash msfploit.sh
 ```
 
 # screenshoot
